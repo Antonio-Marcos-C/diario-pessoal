@@ -1,0 +1,44 @@
+name: backend CI
+
+
+on:
+push:
+paths:
+- 'backend/**'
+- '.github/workflows/backend-ci.yml'
+pull_request:
+paths:
+- 'backend/**'
+- '.github/workflows/backend-ci.yml'
+
+
+jobs:
+build-test-sonar:
+runs-on: ubuntu-latest
+defaults:
+run:
+working-directory: backend
+env:
+# Necessário para a JwtService nos testes
+JWT_SECRET: 'this_is_a_very_long_32+_bytes_secret_for_tests_1234567890'
+steps:
+- uses: actions/checkout@v4
+
+
+- name: Set up JDK 21
+uses: actions/setup-java@v4
+with:
+distribution: 'temurin'
+java-version: '21'
+cache: 'maven'
+
+- name: Build & Test (JaCoCo)
+run: mvn -B -U clean verify jacoco:report
+
+
+- name: SonarCloud Scan
+uses: SonarSource/sonarcloud-github-action@v2
+env:
+SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+with:
+projectBaseDir: backend
