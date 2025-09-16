@@ -1,0 +1,7 @@
+<h2>Login</h2>
+<form (ngSubmit)="submit()">
+  <input [(ngModel)]="email" name="email" placeholder="Email" required />
+  <input [(ngModel)]="password" name="password" type="password" placeholder="Senha" required />
+  <button type="submit">Entrar</button>
+</form>
+<a routerLink="/register">Criar conta</a>

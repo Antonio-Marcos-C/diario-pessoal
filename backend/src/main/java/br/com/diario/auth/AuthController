@@ -1,0 +1,50 @@
+package br.com.diario.auth;
+
+import br.com.diario.jwt.JwtService;
+import br.com.diario.user.User;
+import br.com.diario.user.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/auth")
+public class AuthController {
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+
+    public AuthController(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
+    }
+
+    @PostMapping("/register")
+    public String register(@RequestBody RegisterRequest request) {
+        if (userRepository.findByEmail(request.email()).isPresent()) {
+            return "E-mail já cadastrado";
+        }
+        User user = User.builder()
+                .email(request.email())
+                .password(passwordEncoder.encode(request.password()))
+                .nomeCompleto(request.nomeCompleto())
+                .role("ROLE_USER")
+                .build();
+        userRepository.save(user);
+        return "Usuário registrado com sucesso";
+    }
+
+    @PostMapping("/login")
+    public AuthResponse login(@RequestBody LoginRequest request) {
+        var user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new RuntimeException("Credenciais inválidas"));
+
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+            throw new RuntimeException("Credenciais inválidas");
+        }
+
+        String token = jwtService.generateToken(user.getEmail());
+        return new AuthResponse(token);
+    }
+}

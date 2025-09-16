@@ -1,0 +1,24 @@
+# ===== Frontend (Angular) =====
+frontendnode_modules
+frontenddist
+frontend.angular
+frontend.angularcache
+
+# ===== Backend (MavenSpring) =====
+backendtarget
+.log
+
+# ===== Envsegredos =====
+.env
+frontend.env
+backend.env
+
+# ===== IDEOS =====
+.vscode
+.idea
+.iml
+.DS_Store
+Thumbs.db
+
+# (Mantenha os wrappers do Maven no repositório)
+# NÃO ignore .mvn e os arquivos mvnwmvnw.cmd
